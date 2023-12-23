@@ -49,12 +49,12 @@ def mysql_run(i,u,p):
         )
         
         # 如果成功连接，打印登录成功消息
-        print(f"mod:{mod}, ip:{i}, port:{port} --> user:{u}, pwd:{p}")
-        write(f"mod:{mod}, ip:{i}, port:{port} --> user:{u}, pwd:{p}")
+        print(f"mod:{mod}, ip:{i.split(':')[0] if ':' in i else i}, port:{i.split(':')[1] if ':' in i else port} --> user:{u}, pwd:{p}")
+        write(f"mod:{mod}, ip:{i.split(':')[0] if ':' in i else i}, port:{i.split(':')[1] if ':' in i else port} --> user:{u}, pwd:{p}")
 
     except pymysql.Error as e:
         # 如果登录失败，打印错误消息
-        print(f"mod:{mod}, ip:{i}, port:{port} --> user:{u}, pwd:{p}, Login failed: {e}")
+        print(f"mod:{mod}, ip:{i.split(':')[0] if ':' in i else i}, port:{i.split(':')[1] if ':' in i else port} --> user:{u}, pwd:{p}, Login failed: {e}")
 
     finally:
         # 关闭数据库连接
@@ -96,15 +96,15 @@ def ssh_run(i,u,p):
             )
 
         # 如果成功连接，打印登录成功消息
-        print(f"mod:{mod}, ip:{i}, port:{port} --> user:{u}, pwd:{p}")
-        write(f"mod:{mod}, ip:{i}, port:{port} --> user:{u}, pwd:{p}")
+        print(f"mod:{mod}, ip:{i.split(':')[0] if ':' in i else i}, port:{i.split(':')[1] if ':' in i else port} --> user:{u}, pwd:{p if args.key ==''else private_key}")
+        write(f"mod:{mod}, ip:{i.split(':')[0] if ':' in i else i}, port:{i.split(':')[1] if ':' in i else port} --> user:{u}, pwd:{p if args.key ==''else private_key}")
 
     except paramiko.AuthenticationException:
-        print(f"mod:{mod}, ip:{i}, port:{port} --> user:{u}, pwd:{p}, Authentication failed, please check your credentials.")
+        print(f"mod:{mod}, ip:{i.split(':')[0] if ':' in i else i}, port:{i.split(':')[1] if ':' in i else port} --> user:{u}, pwd:{p if args.key ==''else private_key}, Authentication failed, please check your credentials.")
     except paramiko.SSHException as e:
-        print(f"mod:{mod}, ip:{i}, port:{port} --> user:{u}, pwd:{p}, SSH connection failed: {e}")
+        print(f"mod:{mod}, ip:{i.split(':')[0] if ':' in i else i}, port:{i.split(':')[1] if ':' in i else port} --> user:{u}, pwd:{p if args.key ==''else private_key}, SSH connection failed: {e}")
     except Exception as e:
-        print(f"mod:{mod}, ip:{i}, port:{port} --> user:{u}, pwd:{p}, Error: {e}")
+        print(f"mod:{mod}, ip:{i.split(':')[0] if ':' in i else i}, port:{i.split(':')[1] if ':' in i else port} --> user:{u}, pwd:{p if args.key ==''else private_key}, Error: {e}")
     finally:
         # 关闭SSH连接
         if ssh_client:
