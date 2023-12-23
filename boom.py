@@ -16,6 +16,7 @@ parser.add_argument('-ip', default='127.0.0.1', type=str, help='ip address')
 parser.add_argument('-key', default='', type=str, help='ip address')
 parser.add_argument('-m', default='mysql', type=str, help='mysql or ssh')
 parser.add_argument('-o', default='ok.txt', type=str, help='out file')
+parser.add_argument('-t', default=10, type=int, help='threads')
 args = parser.parse_args()
 # 初始化参数
 mod=args.m
@@ -30,7 +31,7 @@ def write(data):
         f.writelines(data+'\n')
 
 def mysql_login():
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.t) as executor:
         # 使用嵌套循环生成所有可能的(i, u, p)组合
         for i in ip:
             for u in user:
@@ -63,7 +64,7 @@ def mysql_run(i,u,p):
 
 
 def ssh_login():
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.t) as executor:
         # 使用嵌套循环生成所有可能的(i, u, p)组合
         for i in ip:
             for u in user:
@@ -85,7 +86,13 @@ def ssh_run(i,u,p):
                 hostname=i.split(':')[0] if ':' in i else i,
                 port=i.split(':')[1] if ':' in i else port,
                 username=u,
-                pkey=private_key
+                pkey=private_key,
+                banner_timeout=10,  # 设置超时时间
+                gss_auth=False,  # 禁用GSS认证
+                gss_kex=False,  # 禁用GSS交换
+                look_for_keys=False,  # 禁用查找SSH密钥
+                allow_agent=False,  # 禁用SSH代理
+                ssh_version='2'  # 指定SSH协议版本
             )
         else:
                 ssh_client.connect(
@@ -93,6 +100,12 @@ def ssh_run(i,u,p):
                 port=i.split(':')[1] if ':' in i else port,
                 username=u,
                 password=p,
+                banner_timeout=10,  # 设置超时时间
+                gss_auth=False,  # 禁用GSS认证
+                gss_kex=False,  # 禁用GSS交换
+                look_for_keys=False,  # 禁用查找SSH密钥
+                allow_agent=False,  # 禁用SSH代理
+                ssh_version='2'  # 指定SSH协议版本
             )
 
         # 如果成功连接，打印登录成功消息
@@ -110,7 +123,7 @@ def ssh_run(i,u,p):
         if ssh_client:
             ssh_client.close()
 
-print(f'tyr login {mod}:\n\nip={ip}\n\nuser={user}\n\npwd={pwd}\n\n')
+print(f'try login {mod}:\n\nip={ip}\n\nuser={user}\n\npwd={pwd}\n\n')
 if args.m =='mysql':
     mysql_login()
 else:
