@@ -24,6 +24,8 @@ args = parser.parse_args()
 mod=args.m
 port_mapping = {"mysql": 3306, "ssh": 22, "mssql": 1433}
 ip, user, pwd = [], [], []
+ip = [args.ip] if args.ipf == '' else open(args.ipf, "r").read().strip().split('\n')
+ip = [args.ip] if args.ipp == '' else open(args.ipp, "r").read().strip().split('\n')
 if '/' in args.ip:
     try:
         ip_network = ipaddress.IPv4Network(args.ip, strict=False)
@@ -31,8 +33,6 @@ if '/' in args.ip:
     except ipaddress.AddressValueError:
         print(f"Invalid CIDR format for -ip: {args.ip}")
         exit(1)
-ip = [args.ip] if args.ipf == '' else open(args.ipf, "r").read().strip().split('\n')
-ip = [args.ip] if args.ipp == '' else open(args.ipp, "r").read().strip().split('\n')
 user = [args.u] if args.ul == '' else open(args.ul, "r").read().strip().split('\n')
 pwd = [args.p] if args.pl == '' else open(args.pl, "r").read().strip().split('\n')
 port = port_mapping.get(mod, None)
