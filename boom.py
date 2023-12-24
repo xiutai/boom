@@ -59,6 +59,7 @@ def mysql_run(i,u,p):
             port=mysql_port,
             user=u,
             password=p,
+            connect_timeout=10
         )
         
         # 如果成功连接，打印登录成功消息
