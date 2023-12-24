@@ -2,7 +2,7 @@
 
 ### boom.py -h 帮助命令:
 ```
-python3 boom.py -h
+boom.py -h
 usage: boom.py [-h] [-u U] [-ul UL] [-p P] [-pl PL] [-port PORT] [-ipf IPF] [-ipp IPP] [-ip IP] [-key KEY] [-m M]
                [-o O] [-t T]
 
