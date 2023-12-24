@@ -1,4 +1,4 @@
-# mysql or ssh boom
+# mysql or ssh or mssql boom
 
 ### boom.py -h 帮助命令:
 ```
