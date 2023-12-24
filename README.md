@@ -26,23 +26,23 @@ options:
 #
 ### 爆破指定ip地址的c段ssh协议：
 ```
-python3 boom.py -ip 127.0.0.1/24 -m ssh -pl pwd.txt
+boom.py -ip 127.0.0.1/24 -m ssh -pl pwd.txt
 
 ```
 #
 ### 爆破指定ip mysql协议：
 ```
-python3 boom.py -ip 127.0.0.1 -m mysql -pl pwd.txt
+boom.py -ip 127.0.0.1 -m mysql -pl pwd.txt
 
 ```
 #
 ### 爆破指定ip mssql协议：
 ```
-python3 boom.py -ip 127.0.0.1 -m mssql -pl pwd.txt
+boom.py -ip 127.0.0.1 -m mssql -pl pwd.txt
 
 ```
 ### 批量爆破ssh（格式  ip:port or domain:port file）：
 ```
-python3 boom.py -ipp ip.txt -m ssh -ul user.txt -pl pwd.txt -t 50
+boom.py -ipp ip.txt -m ssh -ul user.txt -pl pwd.txt -t 50
 
 ```
