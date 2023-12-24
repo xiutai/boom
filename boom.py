@@ -53,7 +53,7 @@ def mysql_run(i,u,p):
     try:
         # 尝试连接到MySQL数据库
         mysql_host=i.split(':')[0] if ':' in i else i
-        mysql_port=i.split(':')[1] if ':' in i else port
+        mysql_port=int(i.split(':')[1]) if ':' in i else port
         connection = pymysql.connect(
             host = mysql_host,
             port=mysql_port,
@@ -62,12 +62,12 @@ def mysql_run(i,u,p):
         )
         
         # 如果成功连接，打印登录成功消息
-        print(f"mod:{mod}, ip:{mysql_host}, port:{mysql_port} --> user:{u}, pwd:{p}")
-        write(f"mod:{mod}, ip:{mysql_host}, port:{mysql_port} --> user:{u}, pwd:{p}")
+        print(f"mod:{mod}, ip:{mysql_host}, port:{str(mysql_port)} --> user:{u}, pwd:{p}")
+        write(f"mod:{mod}, ip:{mysql_host}, port:{str(mysql_port)} --> user:{u}, pwd:{p}")
 
     except pymysql.Error as e:
         # 如果登录失败，打印错误消息
-        print(f"mod:{mod}, ip:{mysql_host}, port:{mysql_port} --> user:{u}, pwd:{p}, Login failed: {e}")
+        print(f"mod:{mod}, ip:{mysql_host}, port:{str(mysql_port)} --> user:{u}, pwd:{p}, Login failed: {e}")
 
     finally:
         # 关闭数据库连接
@@ -89,7 +89,7 @@ def ssh_run(i,u,p):
         # 创建SSH客户端对象
         ssh_client = paramiko.SSHClient()
         ssh_hostname = i.split(':')[0] if ':' in i else i
-        ssh_port = i.split(':')[1] if ':' in i else port
+        ssh_port = int(i.split(':')[1]) if ':' in i else port
         # 自动添加主机密钥（仅用于测试，实际生产环境中应谨慎）
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         if args.key !='':
@@ -122,15 +122,15 @@ def ssh_run(i,u,p):
             )
 
         # 如果成功连接，打印登录成功消息
-        print(f"mod:{mod}, ip:{ssh_hostname}, port:{ssh_port} --> user:{u}, pwd:{p if args.key ==''else private_key}")
-        write(f"mod:{mod}, ip:{ssh_hostname}, port:{ssh_port} --> user:{u}, pwd:{p if args.key ==''else private_key}")
+        print(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}")
+        write(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}")
 
     except paramiko.AuthenticationException:
-        print(f"mod:{mod}, ip:{ssh_hostname}, port:{ssh_port} --> user:{u}, pwd:{p if args.key ==''else private_key}, Authentication failed, please check your credentials.")
+        print(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, Authentication failed, please check your credentials.")
     except paramiko.SSHException as e:
-        print(f"mod:{mod}, ip:{ssh_hostname}, port:{ssh_port} --> user:{u}, pwd:{p if args.key ==''else private_key}, SSH connection failed: {e}")
+        print(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, SSH connection failed: {e}")
     except Exception as e:
-        print(f"mod:{mod}, ip:{ssh_hostname}, port:{ssh_port} --> user:{u}, pwd:{p if args.key ==''else private_key}, Error: {e}")
+        print(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, Error: {e}")
     finally:
         # 关闭SSH连接
         if ssh_client:
@@ -148,22 +148,22 @@ def mssql_login():
 def mssql_run(i,u,p):
     # MSSQL连接参数
     server = i.split(':')[0] if ':' in i else i,
-    port = i.split(':')[1] if ':' in i else port,
+    port = int(i.split(':')[1]) if ':' in i else port,
     username = u,
     password = p,
 
     # 构建连接字符串，包括端口号
-    conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server},{port};UID={username};PWD={password}'
+    conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server},{str(port)};UID={username};PWD={password}'
     try:
         # 尝试连接到MSSQL数据库
         connection = pyodbc.connect(conn_str)
         
         # 如果成功连接，打印登录成功消息
-        print(f"mod:{mod}, ip:{server}, port:{port} --> user:{u}, pwd:{p}, Login successful")
+        print(f"mod:{mod}, ip:{server}, port:{str(port)} --> user:{u}, pwd:{p}, Login successful")
 
     except pyodbc.Error as e:
         # 如果登录失败，打印错误消息
-        print(f"mod:{mod}, ip:{server}, port:{port} --> user:{u}, pwd:{p}, Login failed: {e}")
+        print(f"mod:{mod}, ip:{server}, port:{str(port)} --> user:{u}, pwd:{p}, Login failed: {e}")
     finally:
         # 关闭数据库连接
         if connection:
