@@ -11,10 +11,9 @@ parser.add_argument('-u', default='root', type=str, help='user')
 parser.add_argument('-ul', default='', type=str, help='user file')
 parser.add_argument('-p', default='123456', type=str, help='pass')
 parser.add_argument('-pl', default='', type=str, help='pass file')
-parser.add_argument('-port', default=3306, type=int, help='port')
-parser.add_argument('-ipf', default='', type=str, help='ip or domain file')
-parser.add_argument('-ipp', default='', type=str, help='ip:port or domain:port file')
 parser.add_argument('-ip', default='127.0.0.1', type=str, help='192.168.0.1 or 192.168.0.1/24')
+parser.add_argument('-il', default='', type=str, help='ip or domain or ip:port file')
+parser.add_argument('-port', default=0, type=int, help='port')
 parser.add_argument('-key', default='', type=str, help='ssh key file path')
 parser.add_argument('-m', default='mysql', type=str, help='mysql or mssql or ssh')
 parser.add_argument('-o', default='ok.txt', type=str, help='out file')
@@ -24,18 +23,23 @@ args = parser.parse_args()
 mod=args.m
 port_mapping = {"mysql": 3306, "ssh": 22, "mssql": 1433}
 ip, user, pwd = [], [], []
-ip = [args.ip] if args.ipf == '' else open(args.ipf, "r").read().strip().split('\n')
-ip = [args.ip] if args.ipp == '' else open(args.ipp, "r").read().strip().split('\n')
-if '/' in args.ip:
-    try:
-        ip_network = ipaddress.IPv4Network(args.ip, strict=False)
-        ip = [str(ip) for ip in ip_network.hosts()]
-    except ipaddress.AddressValueError:
-        print(f"Invalid CIDR format for -ip: {args.ip}")
-        exit(1)
+if args.il != '':
+    ip = open(args.il, "r").read().strip().split('\n')
+else:
+    if '/' in args.ip:
+        try:
+            ip_network = ipaddress.IPv4Network(args.ip, strict=False)
+            ip = [str(ip) for ip in ip_network.hosts()]
+        except ipaddress.AddressValueError:
+            print(f"Invalid CIDR format for -ip: {args.ip}")
+            exit(1)
+    else:
+        ip=[args.ip]
 user = [args.u] if args.ul == '' else open(args.ul, "r").read().strip().split('\n')
 pwd = [args.p] if args.pl == '' else open(args.pl, "r").read().strip().split('\n')
-port = port_mapping.get(mod, None)
+port = port_mapping.get(mod, None) if args.port==0 else args.port
+
+# 定义写入函数
 def write(data):
     with open(args.o,'a+',encoding='utf-8') as f:
         f.writelines(data+'\n')
