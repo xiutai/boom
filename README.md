@@ -3,7 +3,7 @@
 ### boom.py -h 帮助命令:
 ```
 boom.py -h
-usage: boom.py [-h] [-u U] [-ul UL] [-p P] [-pl PL] [-ip IP] [-il IL] [-port PORT] [-key KEY] [-m M] [-o O] [-t T]
+usage: boom.py [-h] [-u U] [-ul UL] [-p P] [-pl PL] [-ip IP] [-il IL] [-port PORT] [-key KEY] [-m M] [-o O] [-t T] [-log LOG]
 
 write value
 
@@ -20,31 +20,28 @@ options:
   -m M        mysql or mssql or ssh
   -o O        out file
   -t T        threads
+  -log LOG    0:none, 1:memory, 2,file
 ```
+### boom.py -h 帮助命令（中文）:
 ```
--h, --help: 显示帮助信息，列出了所有可用选项和它们的说明。
+usage: boom.py [-h] [-u U] [-ul UL] [-p P] [-pl PL] [-ip IP] [-il IL] [-port PORT] [-key KEY] [-m M] [-o O] [-t T] [-log LOG]
 
--u U: 指定用户。你需要提供一个用户名作为参数，例如：-u username。
+write value
 
--ul UL: 指定用户文件。你可以提供一个包含多个用户名的文件作为参数，每行一个用户名，例如：-ul userfile.txt。
-
--p P: 指定密码。你需要提供密码作为参数，例如：-p password。
-
--pl PL: 指定密码文件。你可以提供一个包含多个密码的文件作为参数，每行一个密码，例如：-pl passwordfile.txt。
-
--ip IP: 指定目标IP地址或IP地址范围。你可以提供单个IP地址或CIDR表示的IP地址范围，例如：-ip 192.168.0.1 或 -ip 192.168.0.1/24。
-
--il IL: 指定IP地址、域名或IP地址与端口的文件。你可以提供一个文件，其中包含多个IP地址、域名或IP地址与端口的组合，例如：-il targets.txt。
-
--port PORT: 指定端口号。你需要提供一个端口号作为参数，例如：-port 22。
-
--key KEY: 指定SSH密钥文件路径。如果你选择了SSH连接模式，你需要提供SSH密钥文件的路径，例如：-key /path/to/ssh/key。
-
--m M: 指定操作模式。你需要选择一种操作模式，可以是"mysql"、"mssql"或"ssh"之一，例如：-m mysql。
-
--o O: 指定输出文件。你可以提供一个文件路径，用于将输出结果保存到文件中，例如：-o output.txt。
-
--t T: 指定线程数。你可以设置线程数，以控制并发执行的任务数量，例如：-t 4
+options:
+  -h, --help  显示帮助信息并退出
+  -u U        指定用户
+  -ul UL      指定用户文件
+  -p P        指定密码
+  -pl PL      指定密码文件
+  -ip IP      指定目标IP地址或IP地址范围 (例如：192.168.0.1 或 192.168.0.1/24)
+  -il IL      指定IP地址、域名或IP地址与端口的文件
+  -port PORT  指定端口号
+  -key KEY    指定SSH密钥文件路径
+  -m M        指定操作模式 (可以是 "mysql"、"mssql" 或 "ssh")
+  -o O        指定输出爆破成功的记录到文件
+  -t T        指定线程数
+  -log LOG    指定日志记录方式 (0:不记录日志, 1:写入内存, 2:写入文件)
 ```
 #
 ### 爆破指定ip地址的c段ssh协议：

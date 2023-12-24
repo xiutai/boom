@@ -4,6 +4,7 @@ import concurrent.futures
 import paramiko
 import pyodbc
 import ipaddress
+import time
 
 
 parser = argparse.ArgumentParser(description='write value')
@@ -18,13 +19,14 @@ parser.add_argument('-key', default='', type=str, help='ssh key file path')
 parser.add_argument('-m', default='mysql', type=str, help='mysql or mssql or ssh')
 parser.add_argument('-o', default='ok.txt', type=str, help='out file')
 parser.add_argument('-t', default=10, type=int, help='threads')
+parser.add_argument('-log', default=1, type=int, help='0:none, 1:memory, 2,file')
 args = parser.parse_args()
 # 初始化参数
 mod=args.m
 port_mapping = {"mysql": 3306, "ssh": 22, "mssql": 1433}
 ip, user, pwd = [], [], []
 if args.il != '':
-    ip = open(args.il, "r").read().strip().split('\n')
+    ip = open(args.il, "r", encoding="utf-8").read().strip().split('\n')
 else:
     if '/' in args.ip:
         try:
@@ -35,13 +37,13 @@ else:
             exit(1)
     else:
         ip=[args.ip]
-user = [args.u] if args.ul == '' else open(args.ul, "r").read().strip().split('\n')
-pwd = [args.p] if args.pl == '' else open(args.pl, "r").read().strip().split('\n')
+user = [args.u] if args.ul == '' else open(args.ul, "r", encoding="utf-8").read().strip().split('\n')
+pwd = [args.p] if args.pl == '' else open(args.pl, "r", encoding="utf-8").read().strip().split('\n')
 port = port_mapping.get(mod, None) if args.port==0 else args.port
-
+logfile = str(int(time.time()))+".txt"
 # 定义写入函数
-def write(data):
-    with open(args.o,'a+',encoding='utf-8') as f:
+def write(data,file):
+    with open(file,'a+',encoding='utf-8') as f:
         f.writelines(data+'\n')
 
 def mysql_login():
@@ -68,11 +70,16 @@ def mysql_run(i,u,p):
         
         # 如果成功连接，打印登录成功消息
         print(f"mod:{mod}, ip:{mysql_host}, port:{str(mysql_port)} --> user:{u}, pwd:{p}")
-        write(f"mod:{mod}, ip:{mysql_host}, port:{str(mysql_port)} --> user:{u}, pwd:{p}")
+        write(f"mod:{mod}, ip:{mysql_host}, port:{str(mysql_port)} --> user:{u}, pwd:{p}", args.o)
 
     except pymysql.Error as e:
         # 如果登录失败，打印错误消息
-        print(f"mod:{mod}, ip:{mysql_host}, port:{str(mysql_port)} --> user:{u}, pwd:{p}, Login failed: {e}")
+        if args.log == 1:
+            print(f"mod:{mod}, ip:{mysql_host}, port:{str(mysql_port)} --> user:{u}, pwd:{p}, Login failed: {e}")
+        elif args.log == 2:
+            write(f"mod:{mod}, ip:{mysql_host}, port:{str(mysql_port)} --> user:{u}, pwd:{p}, Login failed: {e}", logfile)
+        else:
+            pass
 
     finally:
         # 关闭数据库连接
@@ -128,14 +135,29 @@ def ssh_run(i,u,p):
 
         # 如果成功连接，打印登录成功消息
         print(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}")
-        write(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}")
+        write(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}", args.o)
 
     except paramiko.AuthenticationException:
-        print(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, Authentication failed, please check your credentials.")
+        if args.log == 1:
+            print(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, Authentication failed, please check your credentials.")
+        elif args.log == 2:
+            write()(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, Authentication failed, please check your credentials.", logfile)
+        else:
+            pass
     except paramiko.SSHException as e:
-        print(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, SSH connection failed: {e}")
+        if args.log == 1:
+            print(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, SSH connection failed: {e}")
+        elif args.log == 2:
+            write(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, SSH connection failed: {e}", logfile)
+        else:
+            pass
     except Exception as e:
-        print(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, Error: {e}")
+        if args.log == 1:
+            print(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, Error: {e}")
+        elif args.log == 2:
+            write(f"mod:{mod}, ip:{ssh_hostname}, port:{str(ssh_port)} --> user:{u}, pwd:{p if args.key ==''else private_key}, Error: {e}", logfile)
+        else:
+            pass
     finally:
         # 关闭SSH连接
         if ssh_client:
@@ -165,16 +187,22 @@ def mssql_run(i,u,p):
         
         # 如果成功连接，打印登录成功消息
         print(f"mod:{mod}, ip:{server}, port:{str(port)} --> user:{u}, pwd:{p}, Login successful")
+        write(f"mod:{mod}, ip:{server}, port:{str(port)} --> user:{u}, pwd:{p}, Login successful", args.o)
 
     except pyodbc.Error as e:
         # 如果登录失败，打印错误消息
-        print(f"mod:{mod}, ip:{server}, port:{str(port)} --> user:{u}, pwd:{p}, Login failed: {e}")
+        if args.log == 1:
+            print(f"mod:{mod}, ip:{server}, port:{str(port)} --> user:{u}, pwd:{p}, Login failed: {e}")
+        elif args.log == 2:
+            write(f"mod:{mod}, ip:{server}, port:{str(port)} --> user:{u}, pwd:{p}, Login failed: {e}", logfile)
+        else:
+            pass
     finally:
         # 关闭数据库连接
         if connection:
             connection.close()
 
-print(f'try login {mod}:\n\nip={ip}\n\nuser={user}\n\npwd={pwd}\n\n')
+print(f'try login {mod}:\n\nip={ip if args.il =='' else args.il}\n\nuser={user}\n\npwd={pwd}\n\n')
 if args.m =='mysql':
     mysql_login()
 if args.m =='ssh':
