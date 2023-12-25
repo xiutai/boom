@@ -176,11 +176,9 @@ def mssql_run(i,u,p):
     # MSSQL连接参数
     server = i.split(':')[0] if ':' in i else i,
     port = int(i.split(':')[1]) if ':' in i else port,
-    username = u,
-    password = p,
 
     # 构建连接字符串，包括端口号
-    conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server},{str(port)};UID={username};PWD={password}'
+    conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server},{str(port)};UID={u};PWD={p}'
     try:
         # 尝试连接到MSSQL数据库
         connection = pyodbc.connect(conn_str)
@@ -205,7 +203,7 @@ def mssql_run(i,u,p):
 print(f'try login {mod}:\n\nip={ip if args.il =="" else args.il}\n\nuser={user}\n\npwd={pwd}\n\n')
 if args.m =='mysql':
     mysql_login()
-if args.m =='ssh':
+elif args.m =='ssh':
     ssh_login()
-if args.m =='mssql':
+elif args.m =='mssql':
     mssql_login()
