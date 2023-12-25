@@ -13,7 +13,7 @@ parser.add_argument('-ul', default='', type=str, help='user file')
 parser.add_argument('-p', default='123456', type=str, help='pass')
 parser.add_argument('-pl', default='', type=str, help='pass file')
 parser.add_argument('-ip', default='127.0.0.1', type=str, help='192.168.0.1 or 192.168.0.1/24')
-parser.add_argument('-il', default='', type=str, help='ip or domain or ip:port file')
+parser.add_argument('-il', default="", type=str, help='ip or domain or ip:port file')
 parser.add_argument('-port', default=0, type=int, help='port')
 parser.add_argument('-key', default='', type=str, help='ssh key file path')
 parser.add_argument('-m', default='mysql', type=str, help='mysql or mssql or ssh')
@@ -202,7 +202,7 @@ def mssql_run(i,u,p):
         if connection:
             connection.close()
 
-print(f'try login {mod}:\n\nip={ip if args.il =='' else args.il}\n\nuser={user}\n\npwd={pwd}\n\n')
+print(f'try login {mod}:\n\nip={ip if args.il =="" else args.il}\n\nuser={user}\n\npwd={pwd}\n\n')
 if args.m =='mysql':
     mysql_login()
 if args.m =='ssh':
