@@ -93,7 +93,7 @@ def ssh_login():
         for i in ip:
             for u in user:
                 for p in pwd:
-                    # 提交任务给线程池并异步执行mysql_run
+                    # 提交任务给线程池并异步执行ssh_run
                     executor.submit(ssh_run, i, u, p)
 
 def ssh_run(i,u,p):
@@ -169,30 +169,29 @@ def mssql_login():
         for i in ip:
             for u in user:
                 for p in pwd:
-                    # 提交任务给线程池并异步执行mysql_run
+                    # 提交任务给线程池并异步执行mssql_run
                     executor.submit(mssql_run, i, u, p)
 
 def mssql_run(i,u,p):
     # MSSQL连接参数
-    server = i.split(':')[0] if ':' in i else i,
-    port = int(i.split(':')[1]) if ':' in i else port,
-
+    server = i.split(':')[0] if ':' in i else i
+    ms_port = int(i.split(':')[1]) if ':' in i else port
     # 构建连接字符串，包括端口号
-    conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server},{str(port)};UID={u};PWD={p}'
+    conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server},{str(ms_port)};UID={u};PWD={p}'
     try:
         # 尝试连接到MSSQL数据库
         connection = pyodbc.connect(conn_str)
         
         # 如果成功连接，打印登录成功消息
-        print(f"mod:{mod}, ip:{server}, port:{str(port)} --> user:{u}, pwd:{p}, Login successful")
-        write(f"mod:{mod}, ip:{server}, port:{str(port)} --> user:{u}, pwd:{p}, Login successful", args.o)
+        print(f"mod:{mod}, ip:{server}, port:{str(ms_port)} --> user:{u}, pwd:{p}, Login successful")
+        write(f"mod:{mod}, ip:{server}, port:{str(ms_port)} --> user:{u}, pwd:{p}, Login successful", args.o)
 
     except pyodbc.Error as e:
         # 如果登录失败，打印错误消息
         if args.log == 1:
-            print(f"mod:{mod}, ip:{server}, port:{str(port)} --> user:{u}, pwd:{p}, Login failed: {e}")
+            print(f"mod:{mod}, ip:{server}, port:{str(ms_port)} --> user:{u}, pwd:{p}, Login failed: {e}")
         elif args.log == 2:
-            write(f"mod:{mod}, ip:{server}, port:{str(port)} --> user:{u}, pwd:{p}, Login failed: {e}", logfile)
+            write(f"mod:{mod}, ip:{server}, port:{str(ms_port)} --> user:{u}, pwd:{p}, Login failed: {e}", logfile)
         else:
             pass
     finally:
